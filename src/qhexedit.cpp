@@ -828,11 +828,22 @@ void QHexEdit::paintEvent(QPaintEvent *event)
 
         // draw some patterns if needed
         painter.fillRect(event->rect(), viewport()->palette().color(QPalette::Base));
+
+        // draw A-B-A-B pattern
+        QColor colors[2] = { viewport()->palette().color(QPalette::Base), viewport()->palette().color(QPalette::AlternateBase) };
+        for (int row=0, pxPosY = 4; row <= (event->rect().height()/_pxCharHeight); row++, pxPosY += _pxCharHeight)
+           painter.fillRect(QRect(_pxPosHexX, pxPosY, event->rect().width(), _pxCharHeight), colors[row % 2]);
+
         if (_addressArea)
             painter.fillRect(QRect(-pxOfsX, event->rect().top(), _pxPosHexX - _pxGapAdrHex/2, height()), _addressAreaColor);
         if (_asciiArea)
         {
             int linePos = _pxPosAsciiX - (_pxGapHexAscii / 2);
+
+            // "clear" background color around vertical separator
+            painter.fillRect(QRect((linePos - pxOfsX) - 2, event->rect().top(), 5, height()), viewport()->palette().color(QPalette::Base));
+
+            // draw vertical separator
             painter.setPen(Qt::gray);
             painter.drawLine(linePos - pxOfsX, event->rect().top(), linePos - pxOfsX, height());
         }
@@ -866,11 +877,15 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                 QColor c = viewport()->palette().color(QPalette::Base);
                 painter.setPen(colStandard);
 
+                // whether or not to draw a special background rectangle (selection, highlighting)
+                bool hasSpecialBackground = false;
+
                 qint64 posBa = _bPosFirst + bPosLine + colIdx;
                 if ((getSelectionBegin() <= posBa) && (getSelectionEnd() > posBa))
                 {
                     c = _brushSelection.color();
                     painter.setPen(_penSelection);
+                    hasSpecialBackground = true;
                 }
                 else
                 {
@@ -879,16 +894,23 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                         {
                             c = _brushHighlighted.color();
                             painter.setPen(_penHighlighted);
+                            hasSpecialBackground = true;
                         }
                 }
 
                 // render hex value
                 QRect r;
-                if (colIdx == 0)
-                    r.setRect(pxPosX, pxPosY - _pxCharHeight + _pxSelectionSub, 2*_pxCharWidth, _pxCharHeight);
-                else
-                    r.setRect(pxPosX - _pxCharWidth, pxPosY - _pxCharHeight + _pxSelectionSub, 3*_pxCharWidth, _pxCharHeight);
-                painter.fillRect(r, c);
+
+                // draw special background rectangle
+                if (hasSpecialBackground)
+                {
+                    if (colIdx == 0)
+                        r.setRect(pxPosX, pxPosY - _pxCharHeight + _pxSelectionSub, 2*_pxCharWidth, _pxCharHeight);
+                    else
+                        r.setRect(pxPosX - _pxCharWidth, pxPosY - _pxCharHeight + _pxSelectionSub, 3*_pxCharWidth, _pxCharHeight);
+                    painter.fillRect(r, c);
+                }
+
                 hex = _hexDataShown.mid((bPosLine + colIdx) * 2, 2);
                 painter.drawText(pxPosX, pxPosY, hexCaps()?hex.toUpper():hex);
                 pxPosX += 3*_pxCharWidth;
@@ -896,11 +918,17 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                 // render ascii value
                 if (_asciiArea)
                 {
+                    // redraw special background rectangle for ascii area
+                    if (hasSpecialBackground)
+                    {
+                        r.setRect(pxPosAsciiX2, pxPosY - _pxCharHeight + _pxSelectionSub, _pxCharWidth, _pxCharHeight);
+                        painter.fillRect(r, c);
+                    }
+
                     int ch = (uchar)_dataShown.at(bPosLine + colIdx);
                     if ( ch < 0x20 )
                         ch = '.';
-                    r.setRect(pxPosAsciiX2, pxPosY - _pxCharHeight + _pxSelectionSub, _pxCharWidth, _pxCharHeight);
-                    painter.fillRect(r, c);
+
                     painter.drawText(pxPosAsciiX2, pxPosY, QChar(ch));
                     pxPosAsciiX2 += _pxCharWidth;
                 }
