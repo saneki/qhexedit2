@@ -802,6 +802,7 @@ void QHexEdit::mouseMoveEvent(QMouseEvent * event)
     {
         setCursorPosition(actPos);
         setSelection(actPos);
+        ensureVisible();
     }
 }
 
