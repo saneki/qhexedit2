@@ -798,12 +798,11 @@ void QHexEdit::mouseMoveEvent(QMouseEvent * event)
     _blink = false;
     viewport()->update();
     qint64 actPos = cursorPosition(event->pos());
-    if (actPos >= 0)
-    {
-        setCursorPosition(actPos);
-        setSelection(actPos);
-        ensureVisible();
-    }
+    if (actPos < 0)
+        actPos = 0;
+    setCursorPosition(actPos);
+    setSelection(actPos);
+    ensureVisible();
 }
 
 void QHexEdit::mousePressEvent(QMouseEvent * event)
