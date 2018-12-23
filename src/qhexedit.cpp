@@ -902,14 +902,19 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                 painter.setPen(colStandard);
 
                 // whether or not to draw a special background rectangle (selection, highlighting)
-                bool hasSpecialBackground = false;
+                // First bool: whether or not current data has a background
+                // Second bool: whether or not the whitespace afterwards also has a background (like between selected bytes)
+                auto hasSpecialBackground = std::tuple<bool, bool>(false, false);
 
                 qint64 posBa = _bPosFirst + bPosLine + colIdx;
                 if ((getSelectionBegin() <= posBa) && (getSelectionEnd() > posBa))
                 {
                     c = _brushSelection.color();
                     painter.setPen(_penSelection);
-                    hasSpecialBackground = true;
+                    std::get<0>(hasSpecialBackground) = true;
+                    // If not the last byte on line, and not the last byte in selection
+                    if ((colIdx + 1 < _bytesPerLine) && (posBa + 1) < getSelectionEnd())
+                        std::get<1>(hasSpecialBackground) = true;
                 }
                 else
                 {
@@ -918,7 +923,10 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                         {
                             c = _brushHighlighted.color();
                             painter.setPen(_penHighlighted);
-                            hasSpecialBackground = true;
+                            std::get<0>(hasSpecialBackground) = true;
+                            // If not the last byte on line, and not the last byte in mark
+                            if ((colIdx + 1 < _bytesPerLine) && _markedShown.at((int)(posBa - _bPosFirst) + 1))
+                                std::get<1>(hasSpecialBackground) = true;
                         }
                 }
 
@@ -926,12 +934,12 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                 QRect r;
 
                 // draw special background rectangle
-                if (hasSpecialBackground)
+                if (std::get<0>(hasSpecialBackground))
                 {
-                    if (colIdx == 0)
-                        r.setRect(pxPosX, pxPosY - _pxCharHeight + _pxSelectionSub, 2*_pxCharWidth, _pxCharHeight);
+                    if (std::get<1>(hasSpecialBackground))
+                        r.setRect(pxPosX, pxPosY - _pxCharHeight + _pxSelectionSub, 3*_pxCharWidth, _pxCharHeight);
                     else
-                        r.setRect(pxPosX - _pxCharWidth, pxPosY - _pxCharHeight + _pxSelectionSub, 3*_pxCharWidth, _pxCharHeight);
+                        r.setRect(pxPosX, pxPosY - _pxCharHeight + _pxSelectionSub, 2*_pxCharWidth, _pxCharHeight);
                     painter.fillRect(r, c);
                 }
 
@@ -943,7 +951,7 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                 if (_asciiArea)
                 {
                     // redraw special background rectangle for ascii area
-                    if (hasSpecialBackground)
+                    if (std::get<0>(hasSpecialBackground))
                     {
                         r.setRect(pxPosAsciiX2, pxPosY - _pxCharHeight + _pxSelectionSub, _pxCharWidth, _pxCharHeight);
                         painter.fillRect(r, c);
