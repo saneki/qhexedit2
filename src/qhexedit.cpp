@@ -845,9 +845,16 @@ void QHexEdit::paintEvent(QPaintEvent *event)
         painter.fillRect(event->rect(), viewport()->palette().color(QPalette::Base));
 
         // draw A-B-A-B pattern
+        int rowEndSta = _pxPosHexX;
+        int rowEndPos = _pxPosAsciiX + (_pxCharWidth * _bytesPerLine);
+        int rowLength = rowEndPos - rowEndSta;
+        // If background pattern should go beyond row length, use std::max
+        // This should be an option later?
+        if (true)
+            rowLength = std::max(rowLength, event->rect().width());
         QColor colors[2] = { viewport()->palette().color(QPalette::Base), viewport()->palette().color(QPalette::AlternateBase) };
         for (int row=0, pxPosY = 4; row <= (event->rect().height()/_pxCharHeight); row++, pxPosY += _pxCharHeight)
-           painter.fillRect(QRect(_pxPosHexX, pxPosY, event->rect().width(), _pxCharHeight), colors[row % 2]);
+           painter.fillRect(QRect(_pxPosHexX - pxOfsX, pxPosY, rowLength, _pxCharHeight), colors[row % 2]);
 
         if (_addressArea)
             painter.fillRect(QRect(-pxOfsX, event->rect().top(), _pxPosHexX - _pxGapAdrHex/2, height()), _addressAreaColor);
@@ -882,7 +889,7 @@ void QHexEdit::paintEvent(QPaintEvent *event)
             int linePosX = lineCharPosX + (_pxCharWidth / 2) - 1;
 
             painter.setPen(Qt::lightGray);
-            painter.drawLine(linePosX, event->rect().top(), linePosX, height());
+            painter.drawLine(linePosX - pxOfsX, event->rect().top(), linePosX - pxOfsX, height());
         }
 
         // paint hex and ascii area
