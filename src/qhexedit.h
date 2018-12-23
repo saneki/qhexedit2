@@ -302,6 +302,9 @@ public:
     int bytesPerLine();
     void setBytesPerLine(int count);
 
+    int bytesPerVerticalSection();
+    void setBytesPerVerticalSection(int count);
+
     qint64 cursorPosition();
     void setCursorPosition(qint64 position);
 
@@ -385,6 +388,7 @@ private:
     bool _asciiArea;
     qint64 _addressOffset;
     int _bytesPerLine;
+    int _bytesPerVerticalSection;
     int _hexCharsInLine;
     bool _highlighting;
     bool _overwriteMode;

@@ -22,6 +22,7 @@ QHexEdit::QHexEdit(QWidget *parent) : QAbstractScrollArea(parent)
     _lastEventSize = 0;
     _hexCharsInLine = 47;
     _bytesPerLine = 16;
+    _bytesPerVerticalSection = 4;
     _editAreaIsAscii = false;
     _hexCaps = false;
     _dynamicBytesPerLine = false;
@@ -150,6 +151,20 @@ void QHexEdit::setBytesPerLine(int count)
 int QHexEdit::bytesPerLine()
 {
     return _bytesPerLine;
+}
+
+void QHexEdit::setBytesPerVerticalSection(int count)
+{
+    _bytesPerVerticalSection = count;
+
+    adjust();
+    setCursorPosition(_cursorPosition);
+    viewport()->update();
+}
+
+int QHexEdit::bytesPerVerticalSection()
+{
+    return _bytesPerVerticalSection;
 }
 
 void QHexEdit::setCursorPosition(qint64 position)
@@ -859,6 +874,15 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                 address = QString("%1").arg(_bPosFirst + row*_bytesPerLine + _addressOffset, _addrDigits, 16, QChar('0'));
                 painter.drawText(_pxPosAdrX - pxOfsX, pxPosY, address);
             }
+        }
+
+        // draw vertical hex separators
+        for (int i = 0; i < (_bytesPerLine / _bytesPerVerticalSection) - 1; i++) {
+            int lineCharPosX = _pxPosHexX + (_pxCharWidth * ((_bytesPerVerticalSection * (i + 1) * 3) - 1));
+            int linePosX = lineCharPosX + (_pxCharWidth / 2) - 1;
+
+            painter.setPen(Qt::lightGray);
+            painter.drawLine(linePosX, event->rect().top(), linePosX, height());
         }
 
         // paint hex and ascii area
