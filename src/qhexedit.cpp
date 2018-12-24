@@ -908,12 +908,15 @@ void QHexEdit::paintEvent(QPaintEvent *event)
         }
 
         // draw vertical hex separators
-        for (int i = 0; i < (_bytesPerLine / _bytesPerVerticalSection) - 1; i++) {
-            int lineCharPosX = _pxPosHexX + (_pxCharWidth * ((_bytesPerVerticalSection * (i + 1) * 3) - 1));
-            int linePosX = lineCharPosX + (_pxCharWidth / 2) - 1;
+        if (_bytesPerVerticalSection > 0)
+        {
+            for (int i = 0; i < (_bytesPerLine / _bytesPerVerticalSection) - 1; i++) {
+                int lineCharPosX = _pxPosHexX + (_pxCharWidth * ((_bytesPerVerticalSection * (i + 1) * 3) - 1));
+                int linePosX = lineCharPosX + (_pxCharWidth / 2) - 1;
 
-            painter.setPen(_colorVerticalSeparator);
-            painter.drawLine(linePosX - pxOfsX, event->rect().top(), linePosX - pxOfsX, height());
+                painter.setPen(_colorVerticalSeparator);
+                painter.drawLine(linePosX - pxOfsX, event->rect().top(), linePosX - pxOfsX, height());
+            }
         }
 
         // paint hex and ascii area
