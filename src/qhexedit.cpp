@@ -26,6 +26,8 @@ QHexEdit::QHexEdit(QWidget *parent) : QAbstractScrollArea(parent)
     _editAreaIsAscii = false;
     _hexCaps = false;
     _dynamicBytesPerLine = false;
+    _colorHexAsciiSeparator = this->palette().shadow().color();
+    _colorVerticalSeparator = this->palette().dark().color();
 
     _chunks = new Chunks(this);
     _undoStack = new UndoStack(_chunks, this);
@@ -165,6 +167,28 @@ void QHexEdit::setBytesPerVerticalSection(int count)
 int QHexEdit::bytesPerVerticalSection()
 {
     return _bytesPerVerticalSection;
+}
+
+void QHexEdit::setHexAsciiSeparatorColor(const QColor &color)
+{
+    _colorHexAsciiSeparator = color;
+    viewport()->update();
+}
+
+QColor QHexEdit::hexAsciiSeparatorColor()
+{
+    return _colorHexAsciiSeparator;
+}
+
+void QHexEdit::setVerticalSeparatorColor(const QColor &color)
+{
+    _colorVerticalSeparator = color;
+    viewport()->update();
+}
+
+QColor QHexEdit::verticalSeparatorColor()
+{
+    return _colorVerticalSeparator;
 }
 
 void QHexEdit::setCursorPosition(qint64 position)
@@ -866,7 +890,7 @@ void QHexEdit::paintEvent(QPaintEvent *event)
             painter.fillRect(QRect((linePos - pxOfsX) - 2, event->rect().top(), 5, height()), viewport()->palette().color(QPalette::Base));
 
             // draw vertical separator
-            painter.setPen(Qt::gray);
+            painter.setPen(_colorHexAsciiSeparator);
             painter.drawLine(linePos - pxOfsX, event->rect().top(), linePos - pxOfsX, height());
         }
 
@@ -888,7 +912,7 @@ void QHexEdit::paintEvent(QPaintEvent *event)
             int lineCharPosX = _pxPosHexX + (_pxCharWidth * ((_bytesPerVerticalSection * (i + 1) * 3) - 1));
             int linePosX = lineCharPosX + (_pxCharWidth / 2) - 1;
 
-            painter.setPen(Qt::lightGray);
+            painter.setPen(_colorVerticalSeparator);
             painter.drawLine(linePosX - pxOfsX, event->rect().top(), linePosX - pxOfsX, height());
         }
 

@@ -332,6 +332,12 @@ public:
     QColor selectionColor();
     void setSelectionColor(const QColor &color);
 
+    QColor hexAsciiSeparatorColor();
+    void setHexAsciiSeparatorColor(const QColor &color);
+
+    QColor verticalSeparatorColor();
+    void setVerticalSeparatorColor(const QColor &color);
+
 protected:
     // Handle events
     void keyPressEvent(QKeyEvent *event);
@@ -399,6 +405,8 @@ private:
     bool _readOnly;
     bool _hexCaps;
     bool _dynamicBytesPerLine;
+    QColor _colorVerticalSeparator;
+    QColor _colorHexAsciiSeparator;
 
     // other variables
     bool _editAreaIsAscii;                      // flag about the ascii mode edited
