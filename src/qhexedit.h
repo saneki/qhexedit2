@@ -143,6 +143,16 @@ class QHEXEDIT_API QHexEdit : public QAbstractScrollArea
     /*! Set the font of the widget. Please use fixed width fonts like Mono or Courier.*/
     Q_PROPERTY(QFont font READ font WRITE setFont)
 
+    /*! Property hex-ascii separator color sets (setHexAsciiSeparatorColor()) the color of
+    the vertical separator between the hex & ascii areas. You can also read the color (hexAsciiSeparatorColor()).
+    */
+    Q_PROPERTY(QColor hexAsciiSeparatorColor READ hexAsciiSeparatorColor WRITE setHexAsciiSeparatorColor)
+
+    /*! Property vertical separator color sets (setVerticalSeparatorColor()) the color of
+    separators between vertical groups of bytes. You can also read the color (verticalSeparatorColor()).
+    */
+    Q_PROPERTY(QColor verticalSeparatorColor READ verticalSeparatorColor WRITE setVerticalSeparatorColor)
+
 public:
     /*! Creates an instance of QHexEdit.
     \param parent Parent widget of QHexEdit.
