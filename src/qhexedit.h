@@ -88,6 +88,9 @@ class QHEXEDIT_API QHexEdit : public QAbstractScrollArea
     /*! Set and get bytes number per line.*/
     Q_PROPERTY(int bytesPerLine READ bytesPerLine WRITE setBytesPerLine)
 
+    /*! Set and get bytes number per vertical section. Determines where separators will be placed. */
+    Q_PROPERTY(int bytesPerVerticalSection READ bytesPerVerticalSection WRITE setBytesPerVerticalSection)
+
     /*! Porperty cursorPosition sets or gets the position of the editor cursor
     in QHexEdit. Every byte in data has to cursor positions: the lower and upper
     Nibble. Maximum cursor position is factor two of data.size().
